@@ -42,6 +42,7 @@ class StensKubernetes:
             name=name,
             image_pull_policy=pull_policy,
             args=[args],
+            command=["echo", "asd"]
         )
 
         logging.info(
@@ -73,9 +74,8 @@ class StensKubernetes:
 
         return job
 
+
 if __name__ == "__main__":
-
-
     job_id = uuid.uuid4()
     pod_id = job_id
 
