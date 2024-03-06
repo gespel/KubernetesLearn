@@ -41,8 +41,8 @@ class StensKubernetes:
             image=image,
             name=name,
             image_pull_policy=pull_policy,
-            args=[args],
-            command=["echo", "asd"]
+            command=["sh", "-c", "apt-get update && apt-get -y upgrade && apt-get -y install python3 && python3 && while :; do echo '.'; sleep 1; done"],
+            args=[],
         )
 
         logging.info(
