@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6affb9cd-2ef5-4bfd-a81d-975e8169b091" name="Changes" comment="working debian">
+    <list default="true" id="6affb9cd-2ef5-4bfd-a81d-975e8169b091" name="Changes" comment="added endless loop">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -80,7 +80,7 @@
       <option name="presentableId" value="Default" />
       <updated>1709746638028</updated>
       <workItem from="1709746669593" duration="2008000" />
-      <workItem from="1709749656218" duration="3261000" />
+      <workItem from="1709749656218" duration="3664000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -98,7 +98,15 @@
       <option name="project" value="LOCAL" />
       <updated>1709752088234</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added endless loop">
+      <option name="closed" value="true" />
+      <created>1709753035202</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1709753035202</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -107,9 +115,10 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
     <MESSAGE value="working debian" />
-    <option name="LAST_COMMIT_MESSAGE" value="working debian" />
+    <MESSAGE value="added endless loop" />
+    <option name="LAST_COMMIT_MESSAGE" value="added endless loop" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/KubernetesLearn$main.coverage" NAME="main Coverage Results" MODIFIED="1709752855280" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/KubernetesLearn$main.coverage" NAME="main Coverage Results" MODIFIED="1709753291752" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

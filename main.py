@@ -34,8 +34,7 @@ class StensKubernetes:
 
         return namespace
 
-    @staticmethod
-    def create_container(image, name, pull_policy, args):
+    def create_container(self, image, name, pull_policy, args):
 
         container = client.V1Container(
             image=image,
@@ -52,8 +51,8 @@ class StensKubernetes:
 
         return container
 
-    @staticmethod
-    def create_pod_template(pod_name, container):
+
+    def create_pod_template(self, pod_name, container):
         pod_template = client.V1PodTemplateSpec(
             spec=client.V1PodSpec(restart_policy="Never", containers=[container]),
             metadata=client.V1ObjectMeta(name=pod_name, labels={"pod_name": pod_name}),
@@ -61,8 +60,7 @@ class StensKubernetes:
 
         return pod_template
 
-    @staticmethod
-    def create_job(job_name, pod_template):
+    def create_job(self, job_name, pod_template):
         metadata = client.V1ObjectMeta(name=job_name, labels={"job_name": job_name})
 
         job = client.V1Job(
