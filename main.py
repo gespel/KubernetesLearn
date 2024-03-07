@@ -1,9 +1,12 @@
+import json
 import logging
 import argparse
 import uuid
+import yaml
 
 from kubernetes import client
 from kubernetes import config
+from kubernetes.client import V1Container, V1PodSpec, V1Pod
 
 logging.basicConfig(level=logging.INFO)
 config.load_kube_config()
@@ -53,6 +56,20 @@ class StensKubernetesHandler:
         )
 
         return container
+
+    def create_pod_spec(self, container: V1Container):
+        pod_spec = client.V1PodSpec(
+            containers=[container]
+        )
+        return pod_spec
+
+    def create_pod(self, pod_spec: V1PodSpec):
+        return V1Pod(
+            spec=pod_spec
+        )
+
+    def get_pod_yml(self, pod: V1Pod):
+        return yaml.dump(pod.to_dict())
 
     def create_pod_template(self, pod_name, container):
         pod_template = client.V1PodTemplateSpec(
@@ -143,17 +160,36 @@ class StensKubernetes:
 
         self.sk8s.execute_job(
             job_name=job_name,
-            uid=uid,
+            uid=str(uid),
             cmd=cmd_out
         )
+
+    def create_easy_yml(self, job_name: str):
+        return yaml.dump(
+            self.sk8s.create_job(
+                job_name=f"{job_name}",
+                pod_template=self.sk8s.create_pod_template(
+                    pod_name=f"{job_name}-pod",
+                    container=self.sk8s.create_container(
+                        image="debian:latest",
+                        name=f"{job_name}-container",
+                        pull_policy="Always",
+                        command=["echo"]
+                    ),
+                )
+            ).to_dict()
+        )
+
+
 
 
 if __name__ == "__main__":
     sk = StensKubernetes()
-    sk.create_job_and_execute_command(
+    '''sk.create_job_and_execute_command(
         job_name="hallo",
         cmd=[
             ["riftcrawler", "--help"],
             ["riftcrawler", "-a" , "RGAPI-a16c5a5d-3a81-4a3a-a4ca-e00b66007d36", "-s", "TFO Gespel"]
         ]
-    )
+    )'''
+    print(sk.create_job_and_execute_command("ne", [["echo", "asd"]]))
