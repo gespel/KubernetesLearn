@@ -47,7 +47,8 @@ class StensKubernetesHandler:
             image_pull_policy=pull_policy,
             command=command,
             args=[],
-            env=[env]
+            env=[env],
+            restart_policy="Never"
         )
 
         logging.info(
@@ -59,6 +60,7 @@ class StensKubernetesHandler:
 
     def create_pod_spec(self, container: V1Container):
         pod_spec = client.V1PodSpec(
+
             containers=[container]
         )
         return pod_spec
@@ -89,10 +91,11 @@ class StensKubernetesHandler:
 
         return pod_template
 
-    def create_job(self, job_name, pod_template):
+    def create_job(self, job_name, namespace, pod_template):
         metadata = client.V1ObjectMeta(
             name=job_name,
-            labels={"job_name": job_name}
+            labels={"job_name": job_name},
+            namespace=namespace
         )
 
         job = client.V1Job(
@@ -168,6 +171,7 @@ class StensKubernetes:
         return yaml.dump(
             self.sk8s.create_job(
                 job_name=f"{job_name}",
+                namespace="default",
                 pod_template=self.sk8s.create_pod_template(
                     pod_name=f"{job_name}-pod",
                     container=self.sk8s.create_container(
@@ -192,4 +196,4 @@ if __name__ == "__main__":
             ["riftcrawler", "-a" , "RGAPI-a16c5a5d-3a81-4a3a-a4ca-e00b66007d36", "-s", "TFO Gespel"]
         ]
     )'''
-    print(sk.create_job_and_execute_command("ne", [["echo", "asd"]]))
+    print(sk.create_easy_yml("asd"))
