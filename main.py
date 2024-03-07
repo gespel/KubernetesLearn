@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 config.load_kube_config()
 
 
-class StensKubernetes:
+class StensKubernetesHandler:
     def __init__(self):
 
         # Init Kubernetes
@@ -34,74 +34,126 @@ class StensKubernetes:
 
         return namespace
 
-    def create_container(self, image, name, pull_policy, args):
+    def create_container(self, image, name, pull_policy, command: list):
+
+        env = client.V1EnvVar(name="API_KEY", value="RGAPI-a16c5a5d-3a81-4a3a-a4ca-e00b66007d36")
 
         container = client.V1Container(
             image=image,
             name=name,
             image_pull_policy=pull_policy,
-            command=["sh", "-c", "apt-get update && apt-get -y upgrade && apt-get -y install python3 && python3 && while :; do echo '.'; sleep 1; done"],
+            command=command,
             args=[],
+            env=[env]
         )
 
         logging.info(
             f"Created container with name: {container.name}, "
-            f"image: {container.image} and args: {container.args}"
+            f"image: {container.image} and command: {container.command}"
         )
 
         return container
 
-
     def create_pod_template(self, pod_name, container):
         pod_template = client.V1PodTemplateSpec(
-            spec=client.V1PodSpec(restart_policy="Never", containers=[container]),
-            metadata=client.V1ObjectMeta(name=pod_name, labels={"pod_name": pod_name}),
+            spec=client.V1PodSpec(
+                restart_policy="Never",
+                containers=[container]
+            ),
+            metadata=client.V1ObjectMeta(
+                name=pod_name,
+                labels={"pod_name": pod_name}
+            ),
+        )
+
+        logging.info(
+            f"Created pod-template with name: {pod_name}"
         )
 
         return pod_template
 
     def create_job(self, job_name, pod_template):
-        metadata = client.V1ObjectMeta(name=job_name, labels={"job_name": job_name})
+        metadata = client.V1ObjectMeta(
+            name=job_name,
+            labels={"job_name": job_name}
+        )
 
         job = client.V1Job(
             api_version="batch/v1",
             kind="Job",
             metadata=metadata,
-            spec=client.V1JobSpec(backoff_limit=0, template=pod_template),
+            spec=client.V1JobSpec(
+                backoff_limit=0, template=pod_template
+            ),
+        )
+
+        logging.info(
+            f"Created job with name: {job_name}"
         )
 
         return job
 
+    def execute_job(self, job_name: str, uid: str, cmd: list):
+        logging.info(
+            f"Sending job to kubernetes cluster now!"
+        )
+        self.batch_api.create_namespaced_job(
+            namespace="default",
+            body=self.create_job(
+                job_name=f"{job_name}-{uid}",
+                pod_template=self.create_pod_template(
+                    f"{job_name}-pod-{uid}",
+                    self.create_container(
+                        image="gespel/riftcrawler:latest",
+                        name=f"{job_name}-image-{uid}",
+                        pull_policy="Always",
+                        command=cmd
+                    )
+                )
+            )
+        )
+        logging.info(f"Job sent to kubernetes!")
+
+
+class StensKubernetes:
+    def __init__(self):
+        self.sk8s = StensKubernetesHandler()
+
+    def create_job_and_execute_command(self, job_name: str, cmd: list):
+        uid = uuid.uuid4()
+        cmd_out = []
+        cmd_out.extend(["sh", "-c"])
+        i = 0
+        temp_cmd = ""
+
+        for c in cmd:
+
+            command = c[0]
+            for a in range(1, len(c)):
+                command += f" '{c[a]}'"
+
+            if i == (len(cmd) - 1):
+                temp_cmd += command
+            else:
+                temp_cmd += command + " && "
+            i += 1
+        cmd_out.append(temp_cmd)
+
+        logging.info(f"commands are {cmd_out}")
+
+        self.sk8s.execute_job(
+            job_name=job_name,
+            uid=uid,
+            cmd=cmd_out
+        )
+
 
 if __name__ == "__main__":
-    job_id = uuid.uuid4()
-    pod_id = job_id
-
-    """ Steps 1 to 3 is the equivalent of the ./manifestfiles/shuffler_job.yaml """
-
-    # Kubernetes instance
-    k8s = StensKubernetes()
-
-    # STEP1: CREATE A CONTAINER
-    image = "debian:latest"
-    name = "debiantest"
-    pull_policy = "Always"
-
-    container = k8s.create_container(image, name, pull_policy, None)
-    print(container.name)
-
-    # STEP2: CREATE A POD TEMPLATE SPEC
-    pod_name = f"stens-pod-{pod_id}"
-    pod_spec = k8s.create_pod_template(pod_name, container)
-
-    # STEP3: CREATE A JOB
-    job_name = f"stens-job-{job_id}"
-    job = k8s.create_job(job_name, pod_spec)
-
-    # STEP4: CREATE NAMESPACE
-    namespace = "stenscustomnamespace3"
-    k8s.create_namespace(namespace)
-
-    # STEP5: EXECUTE THE JOB
-    batch_api = client.BatchV1Api()
-    batch_api.create_namespaced_job(namespace, job)
+    sk = StensKubernetes()
+    sk.create_job_and_execute_command(
+        job_name="hallo",
+        cmd=[
+            ["riftcrawler", "--help"],
+            ["riftcrawler", "-a" , "RGAPI-a16c5a5d-3a81-4a3a-a4ca-e00b66007d36", "-s", "TFO Gespel"]
+        ]
+    )
