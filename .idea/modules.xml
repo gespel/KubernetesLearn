@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/KubernetesLearn.iml" filepath="$PROJECT_DIR$/.idea/KubernetesLearn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/SKubeCtrl.iml" filepath="$PROJECT_DIR$/.idea/SKubeCtrl.iml" />
     </modules>
   </component>
 </project>
