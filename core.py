@@ -3,6 +3,7 @@ import logging
 import argparse
 import uuid
 import yaml
+import os
 
 from kubernetes import client
 from kubernetes import config
@@ -41,7 +42,7 @@ class StensKubernetesHandler:
 
     def create_container(self, image, name, pull_policy, command: list):
 
-        #env = client.V1EnvVar(name="API_KEY", value="RGAPI-a16c5a5d-3a81-4a3a-a4ca-e00b66007d36")
+        # env = client.V1EnvVar(name="API_KEY", value="RGAPI-a16c5a5d-3a81-4a3a-a4ca-e00b66007d36")
 
         container = client.V1Container(
             image=image,
@@ -141,7 +142,7 @@ class StensKubernetes:
     def __init__(self):
         self.sk8s = StensKubernetesHandler()
 
-    def create_job_and_execute_command(self, job_name: str, cmd: list):
+    def create_job_and_execute_command(self, job_name: str, image_name: str, cmd: list):
         uid = uuid.uuid4()
         cmd_out = []
         cmd_out.extend(["sh", "-c"])
@@ -166,7 +167,7 @@ class StensKubernetes:
         self.sk8s.execute_job(
             job_name=job_name,
             uid=str(uid),
-            image_name="debian:latest",
+            image_name=image_name,
             cmd=cmd_out
         )
 
@@ -188,3 +189,6 @@ class StensKubernetes:
                 ).to_dict()
             )
         )
+
+    def delete_all_local_jobs(self):
+        os.system("kubectl delete jobs `kubectl get jobs -o custom-columns=:.metadata.name`")
