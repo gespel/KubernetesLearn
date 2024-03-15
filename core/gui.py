@@ -1,16 +1,20 @@
 from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit
+from PyQt6 import QtGui
 
 import sys
+import platform
 
-import core
+from core.core import StensKubernetes
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, core: core.StensKubernetes):
+    def __init__(self, core: StensKubernetes):
         super().__init__()
         self.core = core
 
         self.setWindowTitle("SKubeCtrl")
+        self.setWindowIcon(QtGui.QIcon('klogo.png'))
+        self.set_app_icon()
 
         button = QPushButton("Create yml", self)
         button2 = QPushButton("start job", self)
@@ -50,8 +54,14 @@ class MainWindow(QMainWindow):
         for i in range(0, 100):
             self.core.create_job_and_execute_command("gui", "debian:latest", [["echo", "Hello World"]])
 
+    def set_app_icon(self):
+        if platform.system() == 'Windows':
+            # Dieser Code ist spezifisch für Windows
+            import ctypes
+            myappid = 'stenheimbrodt.skuberctrl'  # Eindeutige Anwendungs-ID
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-def start_gui(core: core.StensKubernetes):
+def start_gui(core: StensKubernetes):
     app = QApplication(sys.argv)
     w = MainWindow(core)
     w.setFixedSize(350, 200)
