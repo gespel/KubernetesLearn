@@ -6,7 +6,7 @@ import yaml
 import os
 
 from kubernetes import client
-from kubernetes import config
+from kubernetes import config, utils
 from kubernetes.client import V1Container, V1PodSpec, V1Pod
 
 import tools
@@ -15,12 +15,17 @@ logging.basicConfig(level=logging.INFO)
 config.load_kube_config()
 
 
-class StensKubernetesHandler:
+class StensKubernetesCore:
     def __init__(self):
 
         # Init Kubernetes
         self.core_api = client.CoreV1Api()
         self.batch_api = client.BatchV1Api()
+
+    def execute_yaml_file(self, file_path):
+        config.load_kube_config()
+        k8s_client = client.ApiClient()
+        utils.create_from_yaml(k8s_client, file_path)
 
     def create_namespace(self, namespace):
 
@@ -148,7 +153,7 @@ class StensKubernetesHandler:
 
 class StensKubernetes:
     def __init__(self):
-        self.sk8s = StensKubernetesHandler()
+        self.sk8s = StensKubernetesCore()
 
     def create_job_and_execute_command(self, job_name: str, image_name: str, cmd: list):
         uid = uuid.uuid4()
@@ -206,3 +211,6 @@ class StensKubernetes:
 
     def delete_all_local_jobs(self):
         os.system("kubectl delete jobs `kubectl get jobs -o custom-columns=:.metadata.name`")
+
+    def exectute_all_yaml_files(self):
+        pass
