@@ -115,6 +115,14 @@ class StensKubernetesHandler:
 
         return job
 
+    def list_all_jobs(self, namespace):
+        return self.batch_api.list_namespaced_job(namespace)
+
+    def delete_job(self, job_name, namespace):
+        self.batch_api.delete_namespaced_job(job_name, namespace)
+
+
+
     def execute_job(self, job_name: str, uid: str, image_name: str, cmd: list):
         logging.info(
             f"Sending job to kubernetes cluster now!"
@@ -189,6 +197,12 @@ class StensKubernetes:
                 ).to_dict()
             )
         )
+
+    def delete_all_jobs(self, namespace: str):
+        for job in self.sk8s.list_all_jobs(namespace).items:
+            logging.info(f"{job.metadata.name} is getting deleted...")
+            self.sk8s.delete_job(job.metadata.name, namespace)
+        logging.info(f"all jobs deleted!")
 
     def delete_all_local_jobs(self):
         os.system("kubectl delete jobs `kubectl get jobs -o custom-columns=:.metadata.name`")
