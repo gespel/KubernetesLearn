@@ -23,6 +23,7 @@ class StensKubernetesCore:
         self.batch_api = client.BatchV1Api()
 
     def execute_yaml_file(self, file_path):
+        logging.info(f" is exectued now...")
         config.load_kube_config()
         k8s_client = client.ApiClient()
         utils.create_from_yaml(k8s_client, file_path)
